@@ -4,6 +4,12 @@ import os
 from transformers import BertTokenizer, BertConfig, BertForSequenceClassification
 from tqdm import tqdm
 import click
+from flask import Flask,jsonify,request
+from flask_cors import CORS
+import random
+
+app=Flask(__name__)
+CORS(app)
 
 # Assuming the model and tokenizer are loaded globally
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
@@ -52,6 +58,9 @@ def comparative_score(score1, score2, epsilon=1e-3):
     return 0.5
 
 
+
+
+
 @click.command()
 @click.argument('input_file', type=click.File('r'))
 @click.argument('output_directory', type=click.Path(file_okay=False, exists=True))
@@ -68,6 +77,21 @@ def process_input(input_file, output_directory):
             json.dump({'id': j['id'], 'is_human': float(comparative_score(score1, score2))}, out)
             out.write('\n')
             out.flush()
+ 
+
+# @app.route('/predict', methods=['POST'])
+# def predict_route():
+#     data = request.json
+#     text = data.get('text')
+#     if not text:
+#         return jsonify({'error': 'No text provided'}), 400
+    
+#     prediction = detector.get_score(text) 
+#     print(prediction)
+#     return jsonify({'prediction': prediction})
+
+# if __name__ == '__main__':
+#     app.run(debug=True,port=5000)
 
 
 if __name__ == "__main__":
