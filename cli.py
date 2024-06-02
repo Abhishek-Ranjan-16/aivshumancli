@@ -61,9 +61,9 @@ def comparative_score(score1, score2, epsilon=1e-3):
 
 
 
-@click.command()
-@click.argument('input_file', type=click.File('r'))
-@click.argument('output_directory', type=click.Path(file_okay=False, exists=True))
+# @click.command()
+# @click.argument('input_file', type=click.File('r'))
+# @click.argument('output_directory', type=click.Path(file_okay=False, exists=True))
 def process_input(input_file, output_directory):
     with open(os.path.join(output_directory, 'results.jsonl'), 'w') as out:
         for line in tqdm(input_file, desc='Predicting pairs', unit=' pairs'):
@@ -79,20 +79,24 @@ def process_input(input_file, output_directory):
             out.flush()
  
 
-# @app.route('/predict', methods=['POST'])
-# def predict_route():
-#     data = request.json
-#     text = data.get('text')
-#     if not text:
-#         return jsonify({'error': 'No text provided'}), 400
+@app.route('/predict', methods=['POST'])
+def predict_route():
+    data = request.json
+    text1 = data.get('text1')
+    text2 = data.get('text2')
+ 
+    if not text1:
+        return jsonify({'error': 'No text provided'}), 400
+    if not text2:
+        return jsonify({'error': 'No text provided'}), 400
     
-#     prediction = detector.get_score(text) 
-#     print(prediction)
-#     return jsonify({'prediction': prediction})
+    prediction1 = detector.get_score(text1) 
+    prediction2 = detector.get_score(text2) 
+    # print(prediction1)
+    # print(prediction2)
+    return jsonify({'prediction': float(comparative_score(prediction1, prediction2))})
 
-# if __name__ == '__main__':
-#     app.run(debug=True,port=5000)
+if __name__ == '__main__':
+    app.run(debug=True,port=5000)
 
-
-if __name__ == "__main__":
-    process_input()
+ 
